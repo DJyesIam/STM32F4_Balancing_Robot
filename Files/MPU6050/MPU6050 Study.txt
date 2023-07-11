@@ -1,0 +1,6 @@
+MPU6050은 slave로써 작동한다.
+SDA, SCL은 일반적으로 VDD에  pull-up resistor를 통해 연결된다.
+maximum bus speed : 400kHz(=400000Hz)
+ 
+
+Wire.begin()
