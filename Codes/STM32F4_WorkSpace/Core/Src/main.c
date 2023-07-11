@@ -18,11 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,6 +93,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART6_UART_Init();
+  LL_USART_EnableIT_RXNE(USART6);
+
+  float count = 0.0;
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -103,8 +109,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_13);
-	  HAL_Delay(1000);
+
+	  if (uart_rx_flag){
+		  uart_rx_flag = 0;
+		  if (uart_rx_data == '1') HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  }
+
+	  printf("%f\n", count+= 0.01);
+	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
