@@ -18,17 +18,19 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "MPU6050.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int _write(int file, char *p, int len){
+int _write(int file, char *p, int len){		// printf�????? USART6?�� ?���????? ?��?�� ?��?��
 	for (int i = 0; i < len ; i++){
 		while(!LL_USART_IsActiveFlag_TXE(USART6));
 		LL_USART_TransmitData8(USART6, *(p+i));
@@ -94,11 +96,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART6_UART_Init();
-  LL_USART_EnableIT_RXNE(USART6);
-
-  float count = 0.0;
-
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+
+  MPU6050_Init();
+  printf("MPU6050 Initialization is completed\n");
 
   /* USER CODE END 2 */
 
@@ -109,14 +111,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  if (uart_rx_flag){
-		  uart_rx_flag = 0;
-		  if (uart_rx_data == '1') HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	  }
-
-	  printf("%f\n", count+= 0.01);
-	  HAL_Delay(100);
+	  MPU6050_GetAccel();
+	  MPU6050_GetGyro();
+	  printf("ax : %d  ay : %d  az : %d\n", IMU.ax, IMU.ay, IMU.az);
+	  printf("gx : %d  gy : %d  gz : %d\n\n", IMU.gx, IMU.gy, IMU.gz);
+	  HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
