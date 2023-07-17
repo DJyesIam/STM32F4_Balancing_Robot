@@ -17,11 +17,12 @@ typedef struct _MPU6050{
 	unsigned short gz;
 }MPU6050;
 
+extern MPU6050 IMU;
+
 void MPU6050_Init(void);
+void MPU6050_TransmitData(unsigned char Address, unsigned char Data);
 unsigned char MPU6050_ReceiveData(unsigned char Address);
 void MPU6050_GetAccel(void);
 void MPU6050_GetGyro(void);
-
-extern MPU6050 IMU;
 
 #endif /* INC_MPU6050_H_ */

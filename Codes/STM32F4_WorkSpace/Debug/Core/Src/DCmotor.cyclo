@@ -1,0 +1,6 @@
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1124:22:LL_TIM_EnableCounter	1
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1609:22:LL_TIM_CC_EnableChannel	1
+../Core/Src/DCmotor.c:13:6:DCmotor_Init	1
+../Core/Src/DCmotor.c:21:6:DCmotor_Forward	1
+../Core/Src/DCmotor.c:26:6:DCmotor_Backward	1
+../Core/Src/DCmotor.c:31:6:DCmotor_Stop	1

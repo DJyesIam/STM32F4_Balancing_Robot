@@ -30,6 +30,29 @@ void MPU6050_Init(void){
 
 	LL_I2C_GenerateStopCondition(I2C1);
 
+	printf("MPU6050 Initialization is completed\n");
+}
+
+void MPU6050_TransmitData(unsigned char Address, unsigned char Data){
+
+	LL_I2C_Enable(I2C1);
+
+	LL_I2C_GenerateStartCondition(I2C1);
+	while(!LL_I2C_IsActiveFlag_SB(I2C1));
+
+	LL_I2C_TransmitData8(I2C1, 0x68 << 1);	// MPU6050 Address(Write Mode)
+	while(!LL_I2C_IsActiveFlag_ADDR(I2C1));
+	while(!LL_I2C_IsActiveFlag_TXE(I2C1));
+	LL_I2C_ClearFlag_ADDR(I2C1);
+
+	LL_I2C_TransmitData8(I2C1, Address);	// Transmit Address
+	while(!LL_I2C_IsActiveFlag_TXE(I2C1));
+
+	LL_I2C_TransmitData8(I2C1, Data);		// Transmit Data
+	while(!LL_I2C_IsActiveFlag_TXE(I2C1));
+	while(!LL_I2C_IsActiveFlag_BTF(I2C1));
+
+	LL_I2C_GenerateStopCondition(I2C1);
 }
 
 unsigned char MPU6050_ReceiveData(unsigned char Address){

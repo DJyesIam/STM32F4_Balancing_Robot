@@ -11,6 +11,7 @@
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h:1835:25:LL_I2C_ReceiveData8	1
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h:1847:22:LL_I2C_TransmitData8	1
 ../Core/Src/MPU6050.c:12:6:MPU6050_Init	7
-../Core/Src/MPU6050.c:35:15:MPU6050_ReceiveData	9
-../Core/Src/MPU6050.c:65:6:MPU6050_GetAccel	1
-../Core/Src/MPU6050.c:72:6:MPU6050_GetGyro	1
+../Core/Src/MPU6050.c:36:6:MPU6050_TransmitData	7
+../Core/Src/MPU6050.c:58:15:MPU6050_ReceiveData	9
+../Core/Src/MPU6050.c:88:6:MPU6050_GetAccel	1
+../Core/Src/MPU6050.c:95:6:MPU6050_GetGyro	1
