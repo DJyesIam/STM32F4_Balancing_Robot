@@ -43,6 +43,8 @@
 /* USER CODE BEGIN PV */
 unsigned char uart_rx_flag = 0;
 unsigned char uart_rx_data = 0;
+
+unsigned int count_ms = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -198,6 +200,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+	count_ms++;
+	LL_TIM_ClearFlag_UPDATE(TIM3);
+  /* USER CODE END TIM3_IRQn 1 */
+}
 
 /**
   * @brief This function handles USART6 global interrupt.

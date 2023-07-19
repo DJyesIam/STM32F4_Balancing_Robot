@@ -1,11 +1,11 @@
 Electronic parts
 -Board : STM32f401RCT6 (Arm Cortex-M4)
 -IMU : MPU6050
--Motor : Fucking Yellow Motor
+-Motor : DC Motor
 -Motor Driver : L298N
 -Battery : 3S 1500mAh LiPo Battery
 
 Nonelectronic parts
--Wheel : 3D Printings (Thingiverse)
+-Wheel : 3D Printings
 -Body Parts : 3D Printings (Design by myself)
 -Bolts, Nuts, Cable Tie, ... : In Esperse DongBang

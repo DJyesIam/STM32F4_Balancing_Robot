@@ -5,17 +5,14 @@
  *      Author: miner
  */
 
-#include <stdio.h>
 #include "DCmotor.h"
 #include "stm32f4xx_ll_tim.h"
 
 
 void DCmotor_Init(void){
-	  LL_TIM_EnableCounter(TIM2);
-	  LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
-	  LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
-
-	  printf("DC Motor Initialization is completed\n");
+	LL_TIM_EnableCounter(TIM2);
+	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
+	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
 }
 
 void DCmotor_Forward(unsigned short PWM){

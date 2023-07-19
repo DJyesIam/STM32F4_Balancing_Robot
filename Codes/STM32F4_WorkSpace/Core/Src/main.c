@@ -32,7 +32,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int _write(int file, char *p, int len){		// printf�?????????? USART6?�� ?���?????????? ?��?�� ?��?��
+int _write(int file, char *p, int len){		// printf�??????????? USART6?�� ?���??????????? ?��?�� ?��?��
 	for (int i = 0; i < len ; i++){
 		while(!LL_USART_IsActiveFlag_TXE(USART6));
 		LL_USART_TransmitData8(USART6, *(p+i));
@@ -100,9 +100,14 @@ int main(void)
   MX_USART6_UART_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   MPU6050_Init();
+  MPU6050_Calibration();
   DCmotor_Init();
+  LL_TIM_EnableIT_UPDATE(TIM3);
+  LL_TIM_EnableCounter(TIM3);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -116,19 +121,27 @@ int main(void)
 //	  MPU6050_GetGyro();
 //	  printf("ax : %d  ay : %d  az : %d\n", IMU.ax, IMU.ay, IMU.az);
 //	  printf("gx : %d  gy : %d  gz : %d\n\n", IMU.gx, IMU.gy, IMU.gz);
+//	  HAL_Delay(10);
 
-//	  long unsigned int tim2_ccr1 = TIM2->CCR1;
-//	  long unsigned int tim2_ccr2 = TIM2->CCR2;
-//	  printf("%ld	%ld\n", tim2_ccr1, tim2_ccr2);
+//	  DCmotor_Forward(16000);
+//	  HAL_Delay(2000);
+//
+//	  DCmotor_Backward(16000);
+//	  HAL_Delay(2000);
+//
+//	  DCmotor_Stop();
+//	  HAL_Delay(1000);
 
-	  DCmotor_Forward(16000);
-	  HAL_Delay(2000);
+	  MPU6050_GetAccel();
+	  MPU6050_GetGyro();
+	  MPU6050_GetRoll_Acc();
+	  MPU6050_GetPitch_Acc();
+	  MPU6050_GetRoll_Gyr();
+	  MPU6050_GetPitch_Gyr();
+	  MPU6050_getRoll_Filtered();
+	  MPU6050_getPitch_Filtered();
 
-	  DCmotor_Backward(16000);
-	  HAL_Delay(2000);
-
-	  DCmotor_Stop();
-	  HAL_Delay(1000);
+	  printf("%.1f	%.1f\n", IMU.roll_filtered, IMU.pitch_filtered);
   }
   /* USER CODE END 3 */
 }
