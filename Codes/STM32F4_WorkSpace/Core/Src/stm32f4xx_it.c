@@ -44,7 +44,7 @@
 unsigned char uart_rx_flag = 0;
 unsigned char uart_rx_data = 0;
 
-unsigned int count_ms = 0;
+int count_ms = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

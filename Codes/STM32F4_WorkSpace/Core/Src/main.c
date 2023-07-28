@@ -56,6 +56,16 @@ int _write(int file, char *p, int len){		// printf�??????????? USART6?�� ?
 /* USER CODE BEGIN PV */
 extern unsigned char uart_rx_flag;
 extern unsigned char uart_rx_data;
+
+double target_roll = 0.0;
+double roll_output = 0.0;
+double roll_err;
+unsigned short motor_input;
+double dt_double;
+double P = 1;
+double I = 0;
+double D = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,6 +118,8 @@ int main(void)
   LL_TIM_EnableIT_UPDATE(TIM3);
   LL_TIM_EnableCounter(TIM3);
 
+  printf("Start\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,31 +129,30 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  MPU6050_GetAccel();
-//	  MPU6050_GetGyro();
-//	  printf("ax : %d  ay : %d  az : %d\n", IMU.ax, IMU.ay, IMU.az);
-//	  printf("gx : %d  gy : %d  gz : %d\n\n", IMU.gx, IMU.gy, IMU.gz);
-//	  HAL_Delay(10);
-
-//	  DCmotor_Forward(16000);
-//	  HAL_Delay(2000);
-//
-//	  DCmotor_Backward(16000);
-//	  HAL_Delay(2000);
-//
-//	  DCmotor_Stop();
-//	  HAL_Delay(1000);
+	  getDeltaTime();
+	  dt_double = dt / 1000.f;
 
 	  MPU6050_GetAccel();
 	  MPU6050_GetGyro();
 	  MPU6050_GetRoll_Acc();
-	  MPU6050_GetPitch_Acc();
 	  MPU6050_GetRoll_Gyr();
-	  MPU6050_GetPitch_Gyr();
 	  MPU6050_getRoll_Filtered();
-	  MPU6050_getPitch_Filtered();
 
-	  printf("%.1f	%.1f\n", IMU.roll_filtered, IMU.pitch_filtered);
+	  roll_err = target_roll - IMU.roll_filtered;
+
+	  roll_output = (P * roll_err) + (I * dt * roll_err) + (D / dt * roll_err);
+
+	  if (roll_output > 20.0) roll_output = 20.0;			// 각도 최댓값 제한
+	  else if (roll_output < -20.0) roll_output = -20.0;	// 각도 최댓값 제한
+
+	  if (roll_output > 0){
+		  motor_input = (unsigned int)(roll_output * 200.0) + 1000;
+		  DCmotor_Forward(motor_input);
+	  }
+	  else{
+		  motor_input = (unsigned int)(roll_output * -200.0) + 1000;
+		  DCmotor_Backward(motor_input);
+	  }
   }
   /* USER CODE END 3 */
 }

@@ -8,8 +8,8 @@
 #ifndef INC_DCMOTOR_H_
 #define INC_DCMOTOR_H_
 
-#define MOTOR_MIN_PWM = 2000
-#define MOTOR_MAX_PWM = 16000
+#define MOTOR_MIN_PWM = 1000
+#define MOTOR_MAX_PWM = 7000
 
 void DCmotor_Init(void);
 void DCmotor_Forward(unsigned short PWM);

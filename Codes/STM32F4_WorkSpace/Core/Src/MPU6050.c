@@ -12,11 +12,9 @@
 
 MPU6050 IMU;
 
-unsigned int curTime, prevTime, dt;
-
+int curTime, prevTime, dt;
 
 void MPU6050_Init(void){
-
 	LL_I2C_Enable(I2C1);
 
 	LL_I2C_GenerateStartCondition(I2C1);
@@ -146,12 +144,10 @@ void MPU6050_GetGyro(void){
 
 void MPU6050_GetRoll_Acc(void){
 	IMU.roll_acc = atan(IMU.ay / (sqrt(-IMU.ax * IMU.ax + IMU.az * IMU.az))) * 180 / M_PI;
-//	IMU.roll_acc = atan2(IMU.ay, IMU.az) * 180 / M_PI;
 }
 
 void MPU6050_GetPitch_Acc(void){
 	IMU.pitch_acc = atan(IMU.ax / (sqrt(-IMU.ay * IMU.ay + IMU.az * IMU.az))) * 180 / M_PI;
-//	IMU.pitch_acc = atan2(IMU.ax, IMU.az) * 180 / M_PI;
 }
 
 void MPU6050_GetRoll_Gyr(void){

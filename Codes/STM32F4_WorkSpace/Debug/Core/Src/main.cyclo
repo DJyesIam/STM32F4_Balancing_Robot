@@ -3,6 +3,6 @@
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h:1814:26:LL_USART_IsActiveFlag_TXE	1
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h:2426:22:LL_USART_TransmitData8	1
 ../Core/Src/main.c:35:5:_write	3
-../Core/Src/main.c:76:5:main	1
-../Core/Src/main.c:153:6:SystemClock_Config	3
-../Core/Src/main.c:198:6:Error_Handler	1
+../Core/Src/main.c:86:5:main	4
+../Core/Src/main.c:164:6:SystemClock_Config	3
+../Core/Src/main.c:209:6:Error_Handler	1

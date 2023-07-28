@@ -28,10 +28,8 @@ typedef struct _MPU6050{
 
 	double roll_acc;
 	double pitch_acc;
-
 	double roll_gyr;
 	double pitch_gyr;
-
 	double roll_filtered;
 	double pitch_filtered;
 }MPU6050;
@@ -39,8 +37,8 @@ typedef struct _MPU6050{
 
 extern MPU6050 IMU;
 
-extern unsigned int count_ms;
-extern unsigned int curTime, prevTime, dt;
+extern int count_ms;
+extern int curTime, prevTime, dt;
 
 
 void MPU6050_Init(void);
