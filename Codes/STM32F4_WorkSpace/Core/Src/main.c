@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -26,13 +27,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <math.h>
 #include "MPU6050.h"
 #include "DCmotor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int _write(int file, char *p, int len){		// printf�??????????? USART6?�� ?���??????????? ?��?�� ?��?��
+int _write(int file, char *p, int len){		// printf�???????????????????????????????????? USART6?�� ?���???????????????????????????????????? ?��?�� ?��?��
 	for (int i = 0; i < len ; i++){
 		while(!LL_USART_IsActiveFlag_TXE(USART6));
 		LL_USART_TransmitData8(USART6, *(p+i));
@@ -57,15 +59,6 @@ int _write(int file, char *p, int len){		// printf�??????????? USART6?�� ?
 extern unsigned char uart_rx_flag;
 extern unsigned char uart_rx_data;
 
-double target_roll = 0.0;
-double roll_output = 0.0;
-double roll_err;
-unsigned short motor_input;
-double dt_double;
-double P = 1;
-double I = 0;
-double D = 0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -86,7 +79,24 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	double target_roll = 0.0;
+	double roll_PID = 0.0;
+	double roll_err;
+	double roll_err_sum = 0;
+	double roll_err_dt;
+	double roll_err_prev;
 
+	short motor_input;
+
+	double dt_double = 0.001;
+
+	double Kp = 40;
+	double Ki = 0;
+	double Kd = 0;
+
+	double roll_P;
+	double roll_I;
+	double roll_D;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -111,14 +121,15 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   MPU6050_Init();
   MPU6050_Calibration();
   DCmotor_Init();
   LL_TIM_EnableIT_UPDATE(TIM3);
   LL_TIM_EnableCounter(TIM3);
+  printf("Start Balancing!\n\n");
 
-  printf("Start\n");
 
   /* USER CODE END 2 */
 
@@ -129,8 +140,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  getDeltaTime();
-	  dt_double = dt / 1000.f;
+//	  getDeltaTime();
+//	  if (dt == 0) dt = 1;
+//	  dt_double = dt / 1000.f;
 
 	  MPU6050_GetAccel();
 	  MPU6050_GetGyro();
@@ -138,21 +150,49 @@ int main(void)
 	  MPU6050_GetRoll_Gyr();
 	  MPU6050_getRoll_Filtered();
 
-	  roll_err = target_roll - IMU.roll_filtered;
+	  if (IMU.roll_filtered > 15.0) IMU.roll_filtered = 15.0;	// roll 최대, 최소 제한
+	  else if (IMU.roll_filtered <= -15.0) IMU.roll_filtered = -15.0;
 
-	  roll_output = (P * roll_err) + (I * dt * roll_err) + (D / dt * roll_err);
+	  roll_err = target_roll - IMU.roll_filtered;				// roll error 계산
+	  if (isnan(roll_err) != 0) roll_err = roll_err_prev;		// roll 값이 크게 튀어 nan이 되는 경우 배제
 
-	  if (roll_output > 20.0) roll_output = 20.0;			// 각도 최댓값 제한
-	  else if (roll_output < -20.0) roll_output = -20.0;	// 각도 최댓값 제한
+	  roll_err_sum += roll_err * dt_double;						// roll error 적분 계산
+	  if (roll_err_sum > 15.0) roll_err_sum = 15.0;				// roll errer 적분 최대, 최소 제한
+	  else if (roll_err_sum <= -15.0) roll_err_sum = -15.0;
 
-	  if (roll_output > 0){
-		  motor_input = (unsigned int)(roll_output * 200.0) + 1000;
-		  DCmotor_Forward(motor_input);
-	  }
-	  else{
-		  motor_input = (unsigned int)(roll_output * -200.0) + 1000;
+	  roll_err_dt = (roll_err - roll_err_prev) / dt_double;		// roll error 미분 계산
+	  roll_err_prev = roll_err;									// roll error 이전값 저장
+
+	  roll_P = Kp * roll_err;									// roll P, I, D 계산
+	  roll_I = Ki * roll_err_sum;
+	  roll_D = -Kd * roll_err_dt;
+
+	  roll_PID = roll_P + roll_I + roll_D;						// roll PID 계산
+
+	  if (roll_PID > 0){										// PID 값으로 모터 구동(PWM 최대 제한)
+		  motor_input = 100 + roll_PID;
+		  if (motor_input > 800) motor_input = 800;
 		  DCmotor_Backward(motor_input);
+		  printf("%d\n", motor_input);
 	  }
+	  else {
+		  motor_input = 100 - roll_PID;
+		  if (motor_input > 800) motor_input = 800;
+		  DCmotor_Forward(motor_input);
+		  printf("%d\n", motor_input);
+	  }
+
+//	  printf("%d\n", motor_input);
+
+//	  printf("%.1f\n", IMU.roll_filtered);
+
+//	  printf("%d  %d  %d\n", IMU.ax, IMU.ay, IMU.az);
+
+//	  printf("Hello World!\n");
+//	  HAL_Delay(500);
+
+//	  LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_13);
+//	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -174,10 +214,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLN = 168;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -187,12 +231,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }

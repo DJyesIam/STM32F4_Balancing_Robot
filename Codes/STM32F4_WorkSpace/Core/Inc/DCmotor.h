@@ -12,8 +12,8 @@
 #define MOTOR_MAX_PWM = 7000
 
 void DCmotor_Init(void);
-void DCmotor_Forward(unsigned short PWM);
-void DCmotor_Backward(unsigned short PWM);
+void DCmotor_Forward(short PWM);
+void DCmotor_Backward(short PWM);
 void DCmotor_Stop(void);
 
 #endif /* INC_DCMOTOR_H_ */

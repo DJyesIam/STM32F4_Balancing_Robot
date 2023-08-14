@@ -31,7 +31,10 @@ typedef struct _MPU6050{
 	double roll_gyr;
 	double pitch_gyr;
 	double roll_filtered;
+	double roll_filtered_prev;
 	double pitch_filtered;
+	double pitch_filtered_prev;
+
 }MPU6050;
 
 
