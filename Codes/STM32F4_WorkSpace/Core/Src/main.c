@@ -28,13 +28,13 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <math.h>
-#include "MPU6050.h"
+#include "MPU9250.h"
 #include "DCmotor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int _write(int file, char *p, int len){		// printf�???????????????????????????????????? USART6?�� ?���???????????????????????????????????? ?��?�� ?��?��
+int _write(int file, char *p, int len){		// printf�??????????????????????????????????????? USART6?�� ?���??????????????????????????????????????? ?��?�� ?��?��
 	for (int i = 0; i < len ; i++){
 		while(!LL_USART_IsActiveFlag_TXE(USART6));
 		LL_USART_TransmitData8(USART6, *(p+i));
@@ -87,7 +87,6 @@ int main(void)
 	double roll_err_prev;
 
 	short motor_input;
-
 	double dt_double = 0.001;
 
 	double Kp = 40;
@@ -123,8 +122,8 @@ int main(void)
   MX_TIM3_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  MPU6050_Init();
-  MPU6050_Calibration();
+  MPU9250_Init();
+  MPU9250_Calibration();
   DCmotor_Init();
   LL_TIM_EnableIT_UPDATE(TIM3);
   LL_TIM_EnableCounter(TIM3);
@@ -140,59 +139,47 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  getDeltaTime();
+	  getDeltaTime();
 //	  if (dt == 0) dt = 1;
 //	  dt_double = dt / 1000.f;
 
-	  MPU6050_GetAccel();
-	  MPU6050_GetGyro();
-	  MPU6050_GetRoll_Acc();
-	  MPU6050_GetRoll_Gyr();
-	  MPU6050_getRoll_Filtered();
+	  MPU9250_GetAccel();
+	  MPU9250_GetGyro();
+	  MPU9250_GetRoll_Acc();
+	  MPU9250_GetRoll_Gyr();
+	  MPU9250_getRoll_Filtered();
 
-	  if (IMU.roll_filtered > 15.0) IMU.roll_filtered = 15.0;	// roll 최대, 최소 제한
-	  else if (IMU.roll_filtered <= -15.0) IMU.roll_filtered = -15.0;
+//	  if (IMU.roll_filtered > 15.0) IMU.roll_filtered = 15.0;	// roll filtered max, min limit
+//	  else if (IMU.roll_filtered <= -15.0) IMU.roll_filtered = -15.0;
+//
+//	  roll_err = target_roll - IMU.roll_filtered;				// get roll error
+//	  if (isnan(roll_err) != 0) roll_err = roll_err_prev;		// if roll error is nan, use previous value
+//
+//	  roll_err_sum += roll_err * dt_double;						// roll error integral
+//	  if (roll_err_sum > 15.0) roll_err_sum = 15.0;				// roll errer max, min limit
+//	  else if (roll_err_sum <= -15.0) roll_err_sum = -15.0;
+//
+//	  roll_err_dt = (roll_err - roll_err_prev) / dt_double;		// get roll error deteritive
+//	  roll_err_prev = roll_err;									// previous roll error save
+//
+//	  roll_P = Kp * roll_err;									// get roll P, I, D
+//	  roll_I = Ki * roll_err_sum;
+//	  roll_D = -Kd * roll_err_dt;
+//
+//	  roll_PID = roll_P + roll_I + roll_D;						// get roll PID
+//
+//	  if (roll_PID > 0){										// run motor by PWM
+//		  motor_input = 150 + roll_PID;
+//		  if (motor_input > 800) motor_input = 800;
+//		  DCmotor_Backward(motor_input);
+//	  }
+//	  else {
+//		  motor_input = 150 - roll_PID;
+//		  if (motor_input > 800) motor_input = 800;
+//		  DCmotor_Forward(motor_input);
+//	  }
 
-	  roll_err = target_roll - IMU.roll_filtered;				// roll error 계산
-	  if (isnan(roll_err) != 0) roll_err = roll_err_prev;		// roll 값이 크게 튀어 nan이 되는 경우 배제
-
-	  roll_err_sum += roll_err * dt_double;						// roll error 적분 계산
-	  if (roll_err_sum > 15.0) roll_err_sum = 15.0;				// roll errer 적분 최대, 최소 제한
-	  else if (roll_err_sum <= -15.0) roll_err_sum = -15.0;
-
-	  roll_err_dt = (roll_err - roll_err_prev) / dt_double;		// roll error 미분 계산
-	  roll_err_prev = roll_err;									// roll error 이전값 저장
-
-	  roll_P = Kp * roll_err;									// roll P, I, D 계산
-	  roll_I = Ki * roll_err_sum;
-	  roll_D = -Kd * roll_err_dt;
-
-	  roll_PID = roll_P + roll_I + roll_D;						// roll PID 계산
-
-	  if (roll_PID > 0){										// PID 값으로 모터 구동(PWM 최대 제한)
-		  motor_input = 100 + roll_PID;
-		  if (motor_input > 800) motor_input = 800;
-		  DCmotor_Backward(motor_input);
-		  printf("%d\n", motor_input);
-	  }
-	  else {
-		  motor_input = 100 - roll_PID;
-		  if (motor_input > 800) motor_input = 800;
-		  DCmotor_Forward(motor_input);
-		  printf("%d\n", motor_input);
-	  }
-
-//	  printf("%d\n", motor_input);
-
-//	  printf("%.1f\n", IMU.roll_filtered);
-
-//	  printf("%d  %d  %d\n", IMU.ax, IMU.ay, IMU.az);
-
-//	  printf("Hello World!\n");
-//	  HAL_Delay(500);
-
-//	  LL_GPIO_TogglePin(GPIOC, LL_GPIO_PIN_13);
-//	  HAL_Delay(500);
+	  printf("%.1f\n", IMU.roll_filtered);
   }
   /* USER CODE END 3 */
 }

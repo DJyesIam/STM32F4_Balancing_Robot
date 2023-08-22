@@ -56,7 +56,7 @@ void MX_TIM2_Init(void)
   TIM_OC_InitStruct.CompareValue = 0;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   LL_TIM_OC_Init(TIM2, LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
-  LL_TIM_OC_EnableFast(TIM2, LL_TIM_CHANNEL_CH1);
+  LL_TIM_OC_DisableFast(TIM2, LL_TIM_CHANNEL_CH1);
   LL_TIM_OC_EnablePreload(TIM2, LL_TIM_CHANNEL_CH2);
   LL_TIM_OC_Init(TIM2, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
   LL_TIM_OC_EnableFast(TIM2, LL_TIM_CHANNEL_CH2);

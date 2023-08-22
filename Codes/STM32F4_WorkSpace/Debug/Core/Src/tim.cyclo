@@ -4,6 +4,7 @@
 ../Drivers/CMSIS/Include/core_cm4.h:1863:26:NVIC_EncodePriority	2
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1304:22:LL_TIM_EnableARRPreload	1
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1900:22:LL_TIM_OC_EnableFast	7
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1922:22:LL_TIM_OC_DisableFast	7
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:1966:22:LL_TIM_OC_EnablePreload	7
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:2691:22:LL_TIM_SetClockSource	1
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h:2737:22:LL_TIM_SetTriggerOutput	1
